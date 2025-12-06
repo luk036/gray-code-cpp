@@ -1,5 +1,5 @@
 
-enum class 
+enum class
 
 EdgeDir { Hor, Ver, None };
 
