@@ -17,9 +17,35 @@
 
 #pragma once
 
+/**
+ * @brief Represents a rectangle in a rectangulation.
+ *
+ * Each rectangle is defined by four vertices representing its corners:
+ * - nwest: Northwest corner vertex ID
+ * - neast: Northeast corner vertex ID
+ * - swest: Southwest corner vertex ID
+ * - seast: Southeast corner vertex ID
+ */
 class Rectangle {
   public:
-    int nwest_, neast_, swest_, seast_;
+    /** @brief Northwest corner vertex ID */
+    int nwest_;
+    /** @brief Northeast corner vertex ID */
+    int neast_;
+    /** @brief Southwest corner vertex ID */
+    int swest_;
+    /** @brief Southeast corner vertex ID */
+    int seast_;
+
+    /** @brief Default constructor */
     Rectangle();
-    void init(int, int, int, int);
+
+    /**
+     * @brief Initialize rectangle with corner vertex IDs.
+     * @param neast Northeast corner vertex ID
+     * @param seast Southeast corner vertex ID
+     * @param swest Southwest corner vertex ID
+     * @param nwest Northwest corner vertex ID
+     */
+    void init(int neast, int seast, int swest, int nwest);
 };

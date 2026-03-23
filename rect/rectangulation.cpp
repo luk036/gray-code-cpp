@@ -25,6 +25,17 @@
 #include <iostream>
 #include <vector>
 
+/**
+ * @brief Construct a rectangulation with n rectangles.
+ *
+ * Initializes the rectangulation following M1 from the algorithm:
+ * - Sets all edges to vertical orientation
+ * - Initializes state vectors o_ and s_
+ *
+ * @param n Number of rectangles
+ * @param type Type of rectangulation
+ * @param patterns Forbidden patterns
+ */
 Rectangulation::Rectangulation(int n, RectangulationType type, std::vector<RectangulationPattern> &patterns)
     : n_(n), type_(type), patterns_(patterns) {
     // M1 - Initialize
@@ -37,6 +48,13 @@ Rectangulation::Rectangulation(int n, RectangulationType type, std::vector<Recta
     }
 }
 
+/**
+ * @brief Initialize the rectangulation with all vertical edges.
+ *
+ * Sets up the 3n+1 edges, 2n+2 vertices, n rectangles, and n+3 walls
+ * that form the initial rectangulation structure. The initial state
+ * has all rectangles arranged vertically side by side.
+ */
 void Rectangulation::set_all_vertical() {
     // initialize the 3n+1 edges, 2n+2 vertices, n rectangles and n+3 walls
     std::vector<Edge> edges(3 * this->n_ + 2, Edge());
@@ -91,6 +109,13 @@ void Rectangulation::set_all_vertical() {
     init(vertices, walls, edges, rectangles);
 }
 
+/**
+ * @brief Initialize rectangulation with pre-built data structures.
+ * @param vertices Vector of vertices
+ * @param walls Vector of walls
+ * @param edges Vector of edges
+ * @param rectangles Vector of rectangles
+ */
 void Rectangulation::init(std::vector<Vertex> &vertices,
                           std::vector<Wall> &walls, std::vector<Edge> &edges,
                           std::vector<Rectangle> &rectangles) {
@@ -100,6 +125,12 @@ void Rectangulation::init(std::vector<Vertex> &vertices,
     this->rectangles_ = rectangles;
 }
 
+/**
+ * @brief Print internal data structures for debugging.
+ *
+ * Outputs edges, vertices, walls, and rectangles with their
+ * properties in a format matching the paper's figures.
+ */
 void Rectangulation::print_data() {
     // output data structures as in the corresponding figure in the paper
     std::cout << "edges:" << std::endl;
@@ -165,6 +196,12 @@ void Rectangulation::print_data() {
     }
 }
 
+/**
+ * @brief Print rectangle coordinates to stdout.
+ *
+ * Dispatches to appropriate coordinate printing function based on
+ * rectangulation type.
+ */
 void Rectangulation::print_coordinates() {
     switch (this->type_) {
     case (RectangulationType::generic):
@@ -180,6 +217,13 @@ void Rectangulation::print_coordinates() {
     }
 }
 
+/**
+ * @brief Print coordinates using greedy grid placement algorithm.
+ *
+ * Uses a sweep-based algorithm to find equispaced grid coordinates:
+ * - Sweep west to east to determine x-coordinates
+ * - Sweep south to north to determine y-coordinates
+ */
 void Rectangulation::print_coordinates_generic() {
     // Run the greedy algorithm for finding an equispaced grid to place the
     // vertices of the rectangles. For finding the x-coordinates of the grid, we
@@ -315,6 +359,18 @@ void Rectangulation::print_coordinates_generic() {
     std::cout << std::endl;
 }
 
+/**
+ * @brief DFS from bottom-left corner for coordinate assignment.
+ *
+ * Grows a binary tree rooted at the bottom-left corner. Checks the order
+ * in which the diagonal is intersected by leaves and propagates coordinate
+ * values upward.
+ *
+ * @param vertex_id Starting vertex ID
+ * @param val Current value counter (passed by reference)
+ * @param vertex_x_coord Vector to store x-coordinates
+ * @param vertex_y_coord Vector to store y-coordinates
+ */
 void Rectangulation::DFS_BL(int vertex_id, int &val,
                             std::vector<int> &vertex_x_coord,
                             std::vector<int> &vertex_y_coord) {
@@ -352,6 +408,17 @@ void Rectangulation::DFS_BL(int vertex_id, int &val,
         vertex_y_coord[vertex_id] = vertex_y_coord[right_vertex];
     }
 }
+/**
+ * @brief DFS from top-right corner for coordinate assignment.
+ *
+ * Symmetric version of DFS_BL, starting from the top-right corner
+ * instead of bottom-left.
+ *
+ * @param vertex_id Starting vertex ID
+ * @param val Current value counter (passed by reference)
+ * @param vertex_x_coord Vector to store x-coordinates
+ * @param vertex_y_coord Vector to store y-coordinates
+ */
 void Rectangulation::DFS_TR(int vertex_id, int &val,
                             std::vector<int> &vertex_x_coord,
                             std::vector<int> &vertex_y_coord) {
@@ -380,6 +447,13 @@ void Rectangulation::DFS_TR(int vertex_id, int &val,
     }
 }
 
+/**
+ * @brief Print coordinates using diagonal-based placement.
+ *
+ * For diagonal and block-aligned rectangulations, computes coordinates
+ * by growing binary trees from the bottom-left and top-right corners
+ * using DFS_BL and DFS_TR.
+ */
 void Rectangulation::print_coordinates_diagonal() {
     std::vector<int> vertex_x_coord(2 * this->n_ + 3, -1);
     std::vector<int> vertex_y_coord(2 * this->n_ + 3, -1);
@@ -418,6 +492,16 @@ void Rectangulation::print_coordinates_diagonal() {
     std::cout << std::endl;
 }
 
+/**
+ * @brief Generate the next rectangulation in Gray code order.
+ *
+ * Implements one iteration of the memoryless Gray code algorithm:
+ * - M3: Select rectangle j
+ * - M4: Jump rectangle
+ * - M5: Update orientation and state vectors
+ *
+ * @return true if next rectangulation exists, false if at end (identity)
+ */
 bool Rectangulation::next() {
     // Run one iteration of the memoryless algorithm, return true if the next
     // rectangulation is not the identity, false otherwise. M3 - Select
@@ -470,6 +554,16 @@ bool Rectangulation::next() {
     return true;
 }
 
+/**
+ * @brief Check if rectangle j is bottom-based.
+ *
+ * A rectangle is bottom-based if its west edge belongs to the
+ * outer wall (left_ == 0) or, for block-aligned rectangulations,
+ * if the adjacent rectangle shares the same configuration.
+ *
+ * @param j Rectangle index
+ * @return true if rectangle j is bottom-based
+ */
 bool Rectangulation::is_bottom_based(int j) {
     const int a = this->rectangles_[j].nwest_;
     const int alpha = this->vertices_[a].south_;
@@ -487,6 +581,16 @@ bool Rectangulation::is_bottom_based(int j) {
     return false;
 }
 
+/**
+ * @brief Check if rectangle j is right-based.
+ *
+ * A rectangle is right-based if its north edge belongs to the
+ * outer wall (left_ == 0) or, for block-aligned rectangulations,
+ * if the adjacent rectangle shares the same configuration.
+ *
+ * @param j Rectangle index
+ * @return true if rectangle j is right-based
+ */
 bool Rectangulation::is_right_based(int j) {
     const int a = this->rectangles_[j].nwest_;
     const int alpha = this->vertices_[a].east_;
@@ -503,6 +607,14 @@ bool Rectangulation::is_right_based(int j) {
     return false;
 }
 
+/**
+ * @brief Remove edge beta from the head of its current position.
+ *
+ * Updates the doubly-linked edge list by removing beta from its
+ * current position and updating the head vertex and wall references.
+ *
+ * @param beta Edge ID to remove
+ */
 void Rectangulation::remHead(int beta) {
     // Step 1 - Prepare
     const int alpha = this->edges_[beta].prev_;
@@ -524,6 +636,14 @@ void Rectangulation::remHead(int beta) {
         this->walls_[x].last_ = a;
 }
 
+/**
+ * @brief Remove edge beta from the tail of its current position.
+ *
+ * Updates the doubly-linked edge list by removing beta from its
+ * current position and updating the tail vertex and wall references.
+ *
+ * @param beta Edge ID to remove
+ */
 void Rectangulation::remTail(int beta) {
     // Step 1 - Prepare
     const int alpha = this->edges_[beta].prev_;
@@ -545,6 +665,13 @@ void Rectangulation::remTail(int beta) {
         this->walls_[x].first_ = a;
 }
 
+/**
+ * @brief Insert edge beta before edge gamma in the list.
+ *
+ * @param beta Edge ID to insert
+ * @param a Vertex ID for the new edge's head
+ * @param gamma Edge ID to insert before
+ */
 void Rectangulation::insBefore(int beta, int a, int gamma) {
     // Step 1 - Prepare
     const int alpha = this->edges_[gamma].prev_;
@@ -574,6 +701,13 @@ void Rectangulation::insBefore(int beta, int a, int gamma) {
     this->edges_[beta].wall_ = this->edges_[gamma].wall_;
 }
 
+/**
+ * @brief Insert edge beta after edge alpha in the list.
+ *
+ * @param alpha Edge ID to insert after
+ * @param a Vertex ID for the new edge's head
+ * @param beta Edge ID to insert
+ */
 void Rectangulation::insAfter(int alpha, int a, int beta) {
     // Step 1 - Prepare
     const int gamma = this->edges_[alpha].next_;
@@ -603,6 +737,16 @@ void Rectangulation::insAfter(int alpha, int a, int beta) {
     this->edges_[beta].wall_ = this->edges_[alpha].wall_;
 }
 
+/**
+ * @brief Perform horizontal W-jump on rectangle j.
+ *
+ * W-jump (Wall jump) modifies the rectangulation by moving an edge
+ * along the wall. Horizontal variant.
+ *
+ * @param j Rectangle index
+ * @param dir Direction (left or right)
+ * @param alpha Reference edge ID
+ */
 void Rectangulation::Wjump_hor(int j, RectangulationDirection dir, int alpha) {
     if (dir == RectangulationDirection::left) {
         // Step 1 - Prepare
@@ -632,6 +776,16 @@ void Rectangulation::Wjump_hor(int j, RectangulationDirection dir, int alpha) {
     }
 }
 
+/**
+ * @brief Perform vertical W-jump on rectangle j.
+ *
+ * W-jump (Wall jump) modifies the rectangulation by moving an edge
+ * along the wall. Vertical variant.
+ *
+ * @param j Rectangle index
+ * @param dir Direction (left or right)
+ * @param alpha Reference edge ID
+ */
 void Rectangulation::Wjump_ver(int j, RectangulationDirection dir, int alpha) {
     if (dir == RectangulationDirection::right) {
         // Step 1 - Prepare
@@ -661,6 +815,16 @@ void Rectangulation::Wjump_ver(int j, RectangulationDirection dir, int alpha) {
     }
 }
 
+/**
+ * @brief Perform S-jump on rectangle j.
+ *
+ * S-jump (Swap jump) is a flip operation that swaps the orientation
+ * of two adjacent rectangles and updates the wall structure.
+ *
+ * @param j Rectangle index
+ * @param d Direction (left or right)
+ * @param alpha Reference edge ID
+ */
 void Rectangulation::Sjump(int j, RectangulationDirection d, int alpha) {
     if (d == RectangulationDirection::left) {
         // Step 1 - Prepare
@@ -765,6 +929,16 @@ void Rectangulation::Sjump(int j, RectangulationDirection d, int alpha) {
     }
 }
 
+/**
+ * @brief Perform horizontal T-jump on rectangle j.
+ *
+ * T-jump (Transition jump) is a more complex flip operation that
+ * involves three rectangles. Horizontal variant.
+ *
+ * @param j Rectangle index
+ * @param dir Direction (left or right)
+ * @param alpha Reference edge ID
+ */
 void Rectangulation::Tjump_hor(int j, RectangulationDirection dir, int alpha) {
     if (dir == RectangulationDirection::left) {
         // Step 1 - Prepare
@@ -843,6 +1017,16 @@ void Rectangulation::Tjump_hor(int j, RectangulationDirection dir, int alpha) {
     }
 }
 
+/**
+ * @brief Perform vertical T-jump on rectangle j.
+ *
+ * T-jump (Transition jump) is a more complex flip operation that
+ * involves three rectangles. Vertical variant (mirrored from Tjump_hor).
+ *
+ * @param j Rectangle index
+ * @param dir Direction (left or right)
+ * @param alpha Reference edge ID
+ */
 void Rectangulation::Tjump_ver(int j, RectangulationDirection dir, int alpha) {
     // this code is obtained by mirroring Tjump_hor along the main diagonal
     if (dir == RectangulationDirection::right) {
@@ -926,6 +1110,15 @@ void Rectangulation::Tjump_ver(int j, RectangulationDirection dir, int alpha) {
     }
 }
 
+/**
+ * @brief Generate next generic rectangulation from rectangle j.
+ *
+ * Implements N1-N5 from the algorithm: determines which type of
+ * jump operation to perform based on vertex type and direction.
+ *
+ * @param j Rectangle index
+ * @param dir Direction (left or right)
+ */
 void Rectangulation::next_generic(int j, RectangulationDirection dir) {
     // N1 - Prepare
     const int a = this->rectangles_[j].nwest_;
@@ -1003,6 +1196,15 @@ void Rectangulation::next_generic(int j, RectangulationDirection dir) {
     }
 }
 
+/**
+ * @brief Generate next diagonal rectangulation from rectangle j.
+ *
+ * Simplified variant for diagonal rectangulations where all vertices
+ * lie on the main diagonal. Uses only T-jump and S-jump operations.
+ *
+ * @param j Rectangle index
+ * @param dir Direction (left or right)
+ */
 void Rectangulation::next_diagonal(int j, RectangulationDirection dir) {
     // N1 - Prepare
     const int a = this->rectangles_[j].nwest_;
@@ -1058,6 +1260,15 @@ void Rectangulation::next_diagonal(int j, RectangulationDirection dir) {
     }
 }
 
+/**
+ * @brief Generate next block-aligned rectangulation from rectangle j.
+ *
+ * Special handling for block-aligned rectangulations with lock/unlock
+ * operations to maintain the block structure.
+ *
+ * @param j Rectangle index
+ * @param dir Direction (left or right)
+ */
 void Rectangulation::next_baligned(int j, RectangulationDirection dir) {
     // N1 - Prepare
     int a = this->rectangles_[j].nwest_;
@@ -1195,6 +1406,15 @@ void Rectangulation::next_baligned(int j, RectangulationDirection dir) {
     }
 }
 
+/**
+ * @brief Lock rectangle j in the given direction.
+ *
+ * Prevents further flips of rectangle j by performing an S-jump
+ * on adjacent rectangle if the lock condition is met.
+ *
+ * @param j Rectangle index
+ * @param dir Edge direction to lock (Hor or Ver)
+ */
 void Rectangulation::lock(int j, EdgeDir dir) {
     if (dir == EdgeDir::Hor) {
         // L1 - Prepare
@@ -1231,6 +1451,15 @@ void Rectangulation::lock(int j, EdgeDir dir) {
     }
 }
 
+/**
+ * @brief Unlock rectangle j in the given direction.
+ *
+ * Reverses the lock operation by performing an S-jump on the
+ * adjacent rectangle if the unlock condition is met.
+ *
+ * @param j Rectangle index
+ * @param dir Direction (left or right)
+ */
 void Rectangulation::unlock(int j, RectangulationDirection dir) {
     if (dir == RectangulationDirection::right) {
         // U1 - Prepare
@@ -1256,6 +1485,15 @@ void Rectangulation::unlock(int j, RectangulationDirection dir) {
     }
 }
 
+/**
+ * @brief Check if rectangle j contains any forbidden pattern.
+ *
+ * Iterates through all configured forbidden patterns and checks
+ * if any are present in rectangle j.
+ *
+ * @param j Rectangle index
+ * @return true if rectangle j contains a forbidden pattern
+ */
 bool Rectangulation::contains_pattern(int j) {
     // check containment of each possible pattern
     for (auto p : this->patterns_) {
@@ -1297,6 +1535,15 @@ bool Rectangulation::contains_pattern(int j) {
     return false;
 }
 
+/**
+ * @brief Check if rectangle j contains a left-right brick pattern.
+ *
+ * A left-right brick pattern occurs when a right-based rectangle
+ * has a left neighbor.
+ *
+ * @param j Rectangle index
+ * @return true if pattern found
+ */
 bool Rectangulation::contains_brick_leftright(int j) {
     // C1 - Prepare
     const int a = this->rectangles_[j].nwest_;
@@ -1312,6 +1559,15 @@ bool Rectangulation::contains_brick_leftright(int j) {
         return false;
 }
 
+/**
+ * @brief Check if rectangle j contains a right-left brick pattern.
+ *
+ * A right-left brick pattern occurs when a right-based rectangle
+ * has a right neighbor.
+ *
+ * @param j Rectangle index
+ * @return true if pattern found
+ */
 bool Rectangulation::contains_brick_rightleft(int j) {
     // C1 - Prepare
     const int a = this->rectangles_[j].nwest_;
@@ -1327,6 +1583,14 @@ bool Rectangulation::contains_brick_rightleft(int j) {
         return false;
 }
 
+/**
+ * @brief Check if rectangle j contains a bottom-top brick pattern.
+ *
+ * Mirrored variant of contains_brick_leftright along the main diagonal.
+ *
+ * @param j Rectangle index
+ * @return true if pattern found
+ */
 bool Rectangulation::contains_brick_bottomtop(int j) {
     // this code is obtained by mirroring contains_brick_leftright along the
     // main diagonal C1 - Prepare
@@ -1343,6 +1607,14 @@ bool Rectangulation::contains_brick_bottomtop(int j) {
         return false;
 }
 
+/**
+ * @brief Check if rectangle j contains a top-bottom brick pattern.
+ *
+ * Mirrored variant of contains_brick_rightleft along the main diagonal.
+ *
+ * @param j Rectangle index
+ * @return true if pattern found
+ */
 bool Rectangulation::contains_brick_topbottom(int j) {
     // this code is obtained by mirroring contains_brick_rightleft along the
     // main diagonal C1 - Prepare
@@ -1359,6 +1631,15 @@ bool Rectangulation::contains_brick_topbottom(int j) {
         return false;
 }
 
+/**
+ * @brief Check if rectangle j contains a clockwise windmill pattern.
+ *
+ * A clockwise windmill pattern involves four rectangles arranged
+ * around a central vertex with clockwise orientation.
+ *
+ * @param j Rectangle index
+ * @return true if pattern found
+ */
 bool Rectangulation::contains_wmill_clockwise(int j) {
     // C1 - Prepare
     const int a = this->rectangles_[j].nwest_;
@@ -1382,6 +1663,14 @@ bool Rectangulation::contains_wmill_clockwise(int j) {
         return false;
 }
 
+/**
+ * @brief Check if rectangle j contains a counter-clockwise windmill pattern.
+ *
+ * Mirrored variant of contains_wmill_clockwise along the main diagonal.
+ *
+ * @param j Rectangle index
+ * @return true if pattern found
+ */
 bool Rectangulation::contains_wmill_counterclockwise(int j) {
     // this code is obtained by mirroring contains_wmill_clockwise along the
     // main diagonal C1 - Prepare
@@ -1406,6 +1695,15 @@ bool Rectangulation::contains_wmill_counterclockwise(int j) {
         return false;
 }
 
+/**
+ * @brief Check if rectangle j contains a vertical H pattern.
+ *
+ * A vertical H pattern is a specific arrangement of rectangles
+ * that forms an H-shape with vertical orientation.
+ *
+ * @param j Rectangle index
+ * @return true if pattern found
+ */
 bool Rectangulation::contains_H_vertical(int j) {
     // C1 - Prepare
     const int a = this->rectangles_[j].nwest_;
@@ -1441,6 +1739,14 @@ bool Rectangulation::contains_H_vertical(int j) {
     return false;
 }
 
+/**
+ * @brief Check if rectangle j contains a horizontal H pattern.
+ *
+ * Mirrored variant of contains_H_vertical along the main diagonal.
+ *
+ * @param j Rectangle index
+ * @return true if pattern found
+ */
 bool Rectangulation::contains_H_horizontal(int j) {
     // this code is obtained by mirroring contains_H_vertical along the main
     // diagonal C1 - Prepare

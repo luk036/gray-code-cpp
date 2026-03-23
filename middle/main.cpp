@@ -30,10 +30,20 @@
 #undef protected
 
 // Test utilities
+
+/**
+ * @brief Print a test header.
+ * @param test_name Name of the test
+ */
 void print_test_header(const std::string &test_name) {
   std::cout << "=== TEST: " << test_name << " ===\n";
 }
 
+/**
+ * @brief Print a test result.
+ * @param passed Whether the test passed
+ * @param message Optional message to display
+ */
 void print_test_result(bool passed, const std::string &message = "") {
   if (passed) {
     std::cout << "[PASS]";
@@ -46,6 +56,10 @@ void print_test_result(bool passed, const std::string &message = "") {
   std::cout << "\n";
 }
 
+/**
+ * @brief Test vertex construction from bitstring.
+ * @return true if test passed
+ */
 bool test_vertex_construction() {
   print_test_header("Vertex Construction");
   bool passed = true;
@@ -62,6 +76,10 @@ bool test_vertex_construction() {
   return passed;
 }
 
+/**
+ * @brief Test vertex operations (size, indexing, rev_inv).
+ * @return true if test passed
+ */
 bool test_vertex_operations() {
   print_test_header("Vertex Operations");
   bool passed = true;
@@ -107,6 +125,10 @@ bool test_vertex_operations() {
   return passed;
 }
 
+/**
+ * @brief Test vertex path operations (first/last vertex, touchdown, dive).
+ * @return true if test passed
+ */
 bool test_vertex_path_operations() {
   print_test_header("Vertex Path Operations");
   bool passed = true;
@@ -143,6 +165,10 @@ bool test_vertex_path_operations() {
   return passed;
 }
 
+/**
+ * @brief Test flip sequence generation.
+ * @return true if test passed
+ */
 bool test_flip_sequence_generation() {
   print_test_header("Flip Sequence Generation");
   bool passed = true;
@@ -170,6 +196,10 @@ bool test_flip_sequence_generation() {
   return passed;
 }
 
+/**
+ * @brief Test tree construction from vertex.
+ * @return true if test passed
+ */
 bool test_tree_construction() {
   print_test_header("Tree Construction");
   bool passed = true;
@@ -186,6 +216,10 @@ bool test_tree_construction() {
   return passed;
 }
 
+/**
+ * @brief Test tree operations (degree, child access, tau).
+ * @return true if test passed
+ */
 bool test_tree_operations() {
   print_test_header("Tree Operations");
   bool passed = true;
@@ -217,6 +251,10 @@ bool test_tree_operations() {
   return passed;
 }
 
+/**
+ * @brief Test tree transformations (rotation, leaf movement).
+ * @return true if test passed
+ */
 bool test_tree_transformations() {
   print_test_header("Tree Transformations");
   bool passed = true;
@@ -242,6 +280,10 @@ bool test_tree_transformations() {
   return passed;
 }
 
+/**
+ * @brief Test Hamilton cycle construction.
+ * @return true if test passed
+ */
 bool test_hamilton_cycle() {
   print_test_header("Hamilton Cycle");
   bool passed = true;
@@ -259,6 +301,10 @@ bool test_hamilton_cycle() {
   return passed;
 }
 
+/**
+ * @brief Test bitstring comparison functions.
+ * @return true if test passed
+ */
 bool test_bitstring_comparison() {
   print_test_header("Bitstring Comparison");
   bool passed = true;
@@ -276,6 +322,10 @@ bool test_bitstring_comparison() {
   return passed;
 }
 
+/**
+ * @brief Main entry point for the test suite.
+ * @return 0 if all tests passed, 1 otherwise
+ */
 int main() {
   int passed = 0;
   int total = 0;

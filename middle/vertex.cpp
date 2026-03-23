@@ -20,15 +20,32 @@
 #include <cassert>
 #include <vector>
 
+/**
+ * @brief Construct a vertex from a bitstring.
+ *
+ * @param x Bitstring representation of the vertex (size must be odd and >= 3)
+ */
 Vertex::Vertex(const std::vector<int> &x) : bits_(x) {
     assert(x.size() % 2 == 1);
     assert(x.size() >= 3);
 }
 
+/**
+ * @brief Reverse and invert the entire bitstring.
+ *
+ * Performs reversal and complementation (0 -> 1, 1 -> 0)
+ * on all bits except the last one.
+ */
 void Vertex::rev_inv() {
     rev_inv(0, this->bits_.size() - 2); // ignore the last bit
 }
 
+/**
+ * @brief Reverse and invert a range of the bitstring.
+ *
+ * @param left Left index (inclusive)
+ * @param right Right index (inclusive)
+ */
 void Vertex::rev_inv(int left, int right) {
     for (int i = left; i <= right; ++i) {
         this->bits_[i] = 1 - this->bits_[i];
@@ -36,6 +53,12 @@ void Vertex::rev_inv(int left, int right) {
     std::reverse(this->bits_.begin() + left, this->bits_.begin() + right + 1);
 }
 
+/**
+ * @brief Find the first index where the Dyck path returns to the abscissa.
+ *
+ * @param a Starting index
+ * @return Index of first touchdown, or -1 if not found
+ */
 int Vertex::first_touchdown(int a) const {
     int height = 0;
     for (int i = a; i < this->bits_.size() - 1; ++i) { // ignore the last bit
@@ -47,6 +70,11 @@ int Vertex::first_touchdown(int a) const {
     return -1; // error
 }
 
+/**
+ * @brief Find the first index where the Dyck path moves below the abscissa.
+ *
+ * @return Index of first dive, or -1 if not found
+ */
 int Vertex::first_dive() const {
     int height = 0;
     for (int i = 0; i < this->bits_.size() - 1; ++i) { // ignore the last bit
@@ -58,6 +86,16 @@ int Vertex::first_dive() const {
     return -1; // error
 }
 
+/**
+ * @brief Compute positions of all upsteps and downsteps relative to the abscissa.
+ *
+ * Categorizes steps into positive/negative height and up/down.
+ *
+ * @param usteps_neg Output: upsteps below abscissa
+ * @param usteps_pos Output: upsteps above abscissa
+ * @param dsteps_neg Output: downsteps below abscissa
+ * @param dsteps_pos Output: downsteps above abscissa
+ */
 void Vertex::steps_height(std::vector<std::vector<int>> &usteps_neg,
                           std::vector<std::vector<int>> &usteps_pos,
                           std::vector<std::vector<int>> &dsteps_neg,
@@ -99,6 +137,11 @@ void Vertex::steps_height(std::vector<std::vector<int>> &usteps_neg,
     assert(usteps_neg.size() == dsteps_neg.size());
 }
 
+/**
+ * @brief Count the number of downsteps below the abscissa (flaws).
+ *
+ * @return Number of flaws in the Dyck path
+ */
 int Vertex::count_flaws() const {
     int c = 0;
     int height = 0;
@@ -111,6 +154,11 @@ int Vertex::count_flaws() const {
     return c;
 }
 
+/**
+ * @brief Count the number of 1-bits in the bitstring.
+ *
+ * @return Number of 1-bits (ignoring the last bit)
+ */
 int Vertex::count_ones() const {
     int c = 0;
     for (int i = 0; i < this->bits_.size() - 1; ++i) { // ignore last bit
@@ -129,6 +177,11 @@ bool Vertex::is_last_vertex() const {
     return ((count_flaws() == 1) && (count_ones() == this->bits_.size() / 2));
 }
 
+/**
+ * @brief Transform the current vertex to the first vertex of its path.
+ *
+ * @return Distance between current vertex and first vertex along the path
+ */
 int Vertex::to_first_vertex() {
     if (is_last_vertex()) {
         // This case is encountered during the Hamilton cycle
@@ -194,6 +247,11 @@ int Vertex::to_first_vertex() {
     }
 }
 
+/**
+ * @brief Transform the current vertex to the last vertex of its path.
+ *
+ * @return Distance between current vertex and last vertex along the path
+ */
 int Vertex::to_last_vertex() {
     int d = 0;
     if (!is_first_vertex()) {
@@ -212,6 +270,12 @@ int Vertex::to_last_vertex() {
     return d;
 }
 
+/**
+ * @brief Compute flip sequence for the first vertex (sigma recursion).
+ *
+ * @param seq Output: sequence of bit positions to flip
+ * @param flip If true, follow flipped path; otherwise unflipped
+ */
 void Vertex::compute_flip_seq_0(std::vector<int> &seq, bool flip) {
     assert(is_first_vertex());
 
@@ -279,6 +343,15 @@ void Vertex::compute_flip_seq_0(std::vector<int> &seq, bool flip) {
     }
 }
 
+/**
+ * @brief Recursive helper for compute_flip_seq_0.
+ *
+ * @param seq Output: sequence of bit positions
+ * @param idx Current index into seq
+ * @param left Left boundary index
+ * @param right Right boundary index
+ * @param next_step Auxiliary pointer array
+ */
 void Vertex::compute_flip_seq_0_rec(std::vector<int> &seq, int &idx, int left,
                                     int right, int *next_step) const {
     const int length =
@@ -301,6 +374,11 @@ void Vertex::compute_flip_seq_0_rec(std::vector<int> &seq, int &idx, int left,
     compute_flip_seq_0_rec(seq, idx, m + 1, right, next_step);
 }
 
+/**
+ * @brief Compute flip sequence for the last vertex (transformed sigma recursion).
+ *
+ * @param seq Output: sequence of bit positions to flip
+ */
 void Vertex::compute_flip_seq_1(std::vector<int> &seq) const {
     assert(is_last_vertex());
 
@@ -317,6 +395,15 @@ void Vertex::compute_flip_seq_1(std::vector<int> &seq) const {
     seq[idx++] = b;
 }
 
+/**
+ * @brief Recursive helper for compute_flip_seq_1.
+ *
+ * @param seq Output: sequence of bit positions
+ * @param idx Current index into seq
+ * @param left Left boundary index
+ * @param right Right boundary index
+ * @param next_step Auxiliary pointer array
+ */
 void Vertex::compute_flip_seq_1_rec(std::vector<int> &seq, int &idx, int left,
                                     int right, int *next_step) const {
     const int length =
@@ -341,6 +428,13 @@ void Vertex::compute_flip_seq_1_rec(std::vector<int> &seq, int &idx, int left,
     compute_flip_seq_1_rec(seq, idx, m + 1, right, next_step);
 }
 
+/**
+ * @brief Compute auxiliary bidirectional pointers for Dyck path decomposition.
+ *
+ * @param a Left boundary index
+ * @param b Right boundary index
+ * @param next_step Output: array of bidirectional pointers
+ */
 void Vertex::aux_pointers(int a, int b, int *next_step) const {
     assert((a == b + 1) || ((this->bits_[a] == 1) && (this->bits_[b] == 0)));
     // The array left_ustep_height[h] contains the index of the last upstep
@@ -366,6 +460,13 @@ void Vertex::aux_pointers(int a, int b, int *next_step) const {
     assert(height == 0);
 }
 
+/**
+ * @brief Output stream operator for Vertex.
+ *
+ * @param os Output stream
+ * @param v Vertex to output
+ * @return Reference to the output stream
+ */
 std::ostream &operator<<(std::ostream &os, const Vertex &v) {
     // bitstrings can be printed unambiguously without separation characters
     for (int i = 0; i < v.size(); ++i) {
@@ -374,6 +475,14 @@ std::ostream &operator<<(std::ostream &os, const Vertex &v) {
     return os;
 }
 
+/**
+ * @brief Compare two bitstrings lexicographically.
+ *
+ * @param x First bitstring
+ * @param y Second bitstring
+ * @param length Length of both bitstrings
+ * @return true if x < y lexicographically
+ */
 bool bitstrings_less_than(int *x, int *y, int length) {
     for (int i = 0; i < length; ++i) {
         if (x[i] < y[i]) {
@@ -386,6 +495,14 @@ bool bitstrings_less_than(int *x, int *y, int length) {
     return false;
 }
 
+/**
+ * @brief Check if two bitstrings are equal.
+ *
+ * @param x First bitstring
+ * @param y Second bitstring
+ * @param length Length of both bitstrings
+ * @return true if x == y
+ */
 bool bitstrings_equal(int *x, int *y, int length) {
     for (int i = 0; i < length; ++i) {
         if (x[i] != y[i]) {

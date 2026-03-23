@@ -17,8 +17,16 @@
 
 #include "wall.hpp"
 
+/**
+ * @brief Default constructor creating an empty wall.
+ */
 Wall::Wall() {}
 
+/**
+ * @brief Initialize wall with boundary vertices.
+ * @param first First vertex ID in the wall
+ * @param last Last vertex ID in the wall
+ */
 void Wall::init(int first, int last) {
     this->first_ = first;
     this->last_ = last;

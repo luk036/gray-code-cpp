@@ -21,6 +21,16 @@
 #include <cassert>
 #include <vector>
 
+/**
+ * @brief Construct a Hamilton cycle starting from vertex x.
+ *
+ * Computes the next 'limit' vertices on a Hamilton cycle starting from x.
+ * Uses the memoryless Gray code algorithm for the middle levels graph.
+ *
+ * @param x Starting vertex
+ * @param limit Maximum vertices to visit (-1 for complete cycle)
+ * @param visit_f Optional callback function called for each visited vertex
+ */
 HamCycle::HamCycle(const Vertex &x, long long limit, visit_f_t visit_f)
     : x_(x), y_(x), limit_(limit), visit_f_(visit_f) {
     assert(this->x_.size() % 2 == 1);
@@ -157,6 +167,14 @@ HamCycle::HamCycle(const Vertex &x, long long limit, visit_f_t visit_f)
     }
 }
 
+/**
+ * @brief Apply a flip sequence to the current vertex.
+ *
+ * @param seq Sequence of bit positions to flip
+ * @param dist_to_start Remaining distance to starting vertex
+ * @param final_path Whether we are on the final path segment
+ * @return true if computation should terminate
+ */
 bool HamCycle::flip_seq(const std::vector<int> &seq, int &dist_to_start,
                         bool final_path) {
     if ((dist_to_start > 0) || final_path ||

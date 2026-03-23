@@ -20,7 +20,11 @@
 #include <getopt.h>
 #include <iostream>
 
-// display help
+/**
+ * @brief Display command-line help for the rectangulation generator.
+ *
+ * Shows all available options and usage examples.
+ */
 void help() {
     std::cout << "./rect [options]   generate various classes of "
                  "rectangulations as described in [Merino,Muetze]"
@@ -51,6 +55,17 @@ void help() {
     std::cout << "           ./rect -n10 -q -c" << std::endl;
 }
 
+/**
+ * @brief Main entry point for the rectangulation generator.
+ *
+ * Parses command-line arguments and generates rectangulations.
+ * Supports three types: generic, diagonal, and block-aligned.
+ * Can filter out rectangulations containing forbidden patterns.
+ *
+ * @param argc Number of command-line arguments
+ * @param argv Array of command-line argument strings
+ * @return Exit code (0 for success, 1 for error)
+ */
 int main(int argc, char *argv[]) {
     int n;
     bool n_set = false; // flag whether option -n is present

@@ -17,8 +17,18 @@
 
 #include "rectangle.hpp"
 
+/**
+ * @brief Default constructor creating an empty rectangle.
+ */
 Rectangle::Rectangle() {}
 
+/**
+ * @brief Initialize rectangle with corner vertex IDs.
+ * @param neast Northeast corner vertex ID
+ * @param seast Southeast corner vertex ID
+ * @param swest Southwest corner vertex ID
+ * @param nwest Northwest corner vertex ID
+ */
 void Rectangle::init(int neast, int seast, int swest, int nwest) {
     this->nwest_ = nwest;
     this->neast_ = neast;

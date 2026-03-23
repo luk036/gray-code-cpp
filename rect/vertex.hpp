@@ -17,14 +17,47 @@
 
 #pragma once
 
-// The type indicates where the T is pointing to.
-// The 4 corner vertices of the rectangulation have type 'corner'.
+/**
+ * @brief Type of a vertex in the rectangulation.
+ *
+ * The type indicates where the vertex is located:
+ * - corner: Corner vertices of the rectangulation
+ * - top: Vertex on the top boundary
+ * - bottom: Vertex on the bottom boundary
+ * - left: Vertex on the left boundary
+ * - right: Vertex on the right boundary
+ * - None: Invalid/uninitialized vertex
+ */
 enum class VertexType { corner, top, bottom, left, right, None };
 
+/**
+ * @brief Represents a vertex in a rectangulation.
+ *
+ * Each vertex is defined by its incident edges (north, east, south, west)
+ * and its type indicating its position in the rectangulation structure.
+ */
 class Vertex {
   public:
-    int north_, east_, south_, west_;
+    /** @brief Edge ID to the north */
+    int north_;
+    /** @brief Edge ID to the east */
+    int east_;
+    /** @brief Edge ID to the south */
+    int south_;
+    /** @brief Edge ID to the west */
+    int west_;
+    /** @brief Type of this vertex (corner, top, bottom, left, right, or None) */
     VertexType type_;
+
+    /** @brief Default constructor */
     Vertex();
-    void init(int, int, int, int);
+
+    /**
+     * @brief Initialize vertex with edge IDs.
+     * @param north Edge ID to the north
+     * @param east Edge ID to the east
+     * @param south Edge ID to the south
+     * @param west Edge ID to the west
+     */
+    void init(int north, int east, int south, int west);
 };

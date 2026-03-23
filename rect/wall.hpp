@@ -17,9 +17,27 @@
 
 #pragma once
 
+/**
+ * @brief Represents a wall in a rectangulation.
+ *
+ * A wall is a connected sequence of edges forming a boundary
+ * between rectangles or the outer boundary of the rectangulation.
+ * Walls maintain the first and last vertices of the wall edge sequence.
+ */
 class Wall {
   public:
-    int first_, last_;
+    /** @brief First vertex ID in the wall */
+    int first_;
+    /** @brief Last vertex ID in the wall */
+    int last_;
+
+    /** @brief Default constructor */
     Wall();
-    void init(int, int);
+
+    /**
+     * @brief Initialize wall with boundary vertices.
+     * @param first First vertex ID in the wall
+     * @param last Last vertex ID in the wall
+     */
+    void init(int first, int last);
 };

@@ -17,8 +17,22 @@
 
 #include "edge.hpp"
 
+/**
+ * @brief Default constructor creating an empty edge.
+ */
 Edge::Edge() {}
 
+/**
+ * @brief Initialize edge with all properties.
+ * @param dir Edge direction (Hor, Ver, or None)
+ * @param tail Tail vertex ID
+ * @param head Head vertex ID
+ * @param prev Previous edge ID in the doubly-linked list
+ * @param next Next edge ID in the doubly-linked list
+ * @param left Left rectangle/wall ID
+ * @param right Right rectangle ID
+ * @param wall Wall ID this edge belongs to
+ */
 void Edge::init(EdgeDir dir, int tail, int head, int prev, int next, int left,
                 int right, int wall) {
     this->dir_ = dir;

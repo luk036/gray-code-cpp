@@ -17,8 +17,25 @@
 
 #include "vertex.hpp"
 
+/**
+ * @brief Default constructor creating an uninitialized vertex.
+ */
 Vertex::Vertex() { this->type_ = VertexType::None; }
 
+/**
+ * @brief Initialize vertex with edge IDs and automatically determine vertex type.
+ * @param north Edge ID to the north (0 if no edge)
+ * @param east Edge ID to the east (0 if no edge)
+ * @param south Edge ID to the south (0 if no edge)
+ * @param west Edge ID to the west (0 if no edge)
+ *
+ * The vertex type is automatically determined based on which edges are zero:
+ * - 2 zero edges: corner vertex
+ * - south edge is zero: top boundary vertex
+ * - north edge is zero: bottom boundary vertex
+ * - east edge is zero: left boundary vertex
+ * - west edge is zero: right boundary vertex
+ */
 void Vertex::init(int north, int east, int south, int west) {
     this->north_ = north;
     this->east_ = east;

@@ -23,6 +23,13 @@
 #include <list>
 #include <vector>
 
+/**
+ * @brief Construct a tree from a vertex's bitstring representation.
+ *
+ * Interprets the bitstring as a Dyck path and builds the tree structure.
+ *
+ * @param x Vertex containing the bitstring
+ */
 Tree::Tree(const Vertex &x) {
     std::vector<int> xv = x.get_bits(); // extract bitstring representation
     assert(xv.size() % 2 == 1);
@@ -53,6 +60,12 @@ Tree::Tree(const Vertex &x) {
     assert(n == this->num_vertices_);
 }
 
+/**
+ * @brief Get the degree of vertex u.
+ *
+ * @param u Vertex index
+ * @return Degree of the vertex
+ */
 int Tree::deg(int u) const {
     assert((0 <= u) && (u < this->num_vertices_));
     if (u == this->root_) {
@@ -62,11 +75,24 @@ int Tree::deg(int u) const {
     }
 }
 
+/**
+ * @brief Get the number of children of vertex u.
+ *
+ * @param u Vertex index
+ * @return Number of children
+ */
 int Tree::num_children(int u) const {
     assert((0 <= u) && (u < this->num_vertices_));
     return this->children_[u].size();
 }
 
+/**
+ * @brief Get the i-th child of vertex u.
+ *
+ * @param u Parent vertex index
+ * @param i Child index (0-based)
+ * @return Vertex index of the i-th child
+ */
 int Tree::ith_child(int u, int i) const {
     assert((0 <= u) && (u < this->num_vertices_));
     assert((0 <= i) && (i < num_children(u)));
@@ -107,6 +133,11 @@ bool Tree::is_tau_image() const {
     return true;
 }
 
+/**
+ * @brief Apply the tau transformation to the tree.
+ *
+ * Moves a leaf from the root's leftmost child to become a sibling.
+ */
 void Tree::tau() {
     assert(is_tau_preimage());
     const int u = ith_child(root_, 0);
@@ -114,6 +145,11 @@ void Tree::tau() {
     move_leaf(v, root_, 0);
 }
 
+/**
+ * @brief Apply the inverse tau transformation to the tree.
+ *
+ * Moves a leaf from the root to become the leftmost child of the first child.
+ */
 void Tree::tau_inverse() {
     assert(is_tau_image());
     const int v = ith_child(root_, 0);
@@ -121,6 +157,13 @@ void Tree::tau_inverse() {
     move_leaf(v, u, 0);
 }
 
+/**
+ * @brief Move a leaf to a new parent at a specific position.
+ *
+ * @param leaf Leaf vertex to move
+ * @param new_parent New parent vertex
+ * @param pos Position in new parent's child list
+ */
 void Tree::move_leaf(int leaf, int new_parent, int pos) {
     assert((0 <= leaf) && (leaf < this->num_vertices_));
     assert((0 <= new_parent) && (new_parent < this->num_vertices_));
@@ -142,6 +185,9 @@ void Tree::move_leaf(int leaf, int new_parent, int pos) {
     this->parent_[leaf] = new_parent;
 }
 
+/**
+ * @brief Rotate the tree by making the leftmost child the new root.
+ */
 void Tree::rotate() {
     assert(this->num_vertices_ >= 2);
     const int u = ith_child(root_, 0);
@@ -154,6 +200,11 @@ void Tree::rotate() {
     this->root_ = u;
 }
 
+/**
+ * @brief Rotate until vertex u becomes the root.
+ *
+ * @param u Vertex to become the new root
+ */
 void Tree::rotate_to_vertex(int u) {
     while (this->root_ != u) {
         rotate();
@@ -162,6 +213,11 @@ void Tree::rotate_to_vertex(int u) {
 
 void Tree::rotate_children() { rotate_children(1); }
 
+/**
+ * @brief Rotate the root's children by k positions.
+ *
+ * @param k Number of positions to rotate
+ */
 void Tree::rotate_children(int k) {
     std::list<int>::iterator it = this->children_[root_].begin();
     std::advance(it, k);
@@ -183,6 +239,11 @@ bool Tree::flip_tree() {
     return false;
 }
 
+/**
+ * @brief Re-root the tree canonically.
+ *
+ * Computes a canonical way to root the tree based on its structure.
+ */
 void Tree::root_canonically() {
     int c1, c2; // center vertices
     compute_center(c1, c2);
@@ -249,6 +310,12 @@ void Tree::root_canonically() {
     }
 }
 
+/**
+ * @brief Compute the center vertices of the tree.
+ *
+ * @param c1 Output: first center vertex (or only center if c2 = -1)
+ * @param c2 Output: second center vertex, or -1 if only one center
+ */
 void Tree::compute_center(int &c1, int &c2) const {
     // set vertex degrees and store leaves
     std::vector<int> degs(num_vertices_, 0);
@@ -429,11 +496,23 @@ int Tree::count_pending_edges(int u) const {
     return c;
 }
 
+/**
+ * @brief Convert the tree to its bitstring representation.
+ *
+ * @param x Output array for the bitstring
+ */
 void Tree::to_bitstring(int x[]) const {
     int pos = 0;
     to_bitstring_rec(x, root_, pos);
 }
 
+/**
+ * @brief Recursive helper for to_bitstring.
+ *
+ * @param x Output array
+ * @param u Current vertex
+ * @param pos Current position in output array
+ */
 void Tree::to_bitstring_rec(int x[], int u, int &pos) const {
     if (num_children(u) == 0) {
         return;
@@ -450,6 +529,13 @@ void Tree::to_bitstring_rec(int x[], int u, int &pos) const {
 // The source code for this implementation of Booth's
 // algorithm was copied verbatim from the following Wikipedia
 // site: "Lexicographically minimal string rotation"
+/**
+ * @brief Booth's algorithm for lexicographically minimal string rotation.
+ *
+ * @param x Input bitstring
+ * @param length Length of the bitstring
+ * @return Index where the minimal rotation starts
+ */
 int Tree::min_string_rotation(int x[], int length) {
     // concatenate array with itself to avoid modular arithmetic
     int xx[2 * length];
