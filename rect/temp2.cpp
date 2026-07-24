@@ -44,7 +44,7 @@ void Vertex::init(int north, int east, int south, int west) {
     this->west_ = west;
     const int zeros = int(this->north_ == 0) + int(this->south_ == 0) +
                 int(this->west_ == 0) + int(this->east_ == 0);
-    if (zeros >= 3 or zeros <= 0)
+    if (zeros >= 3 || zeros <= 0)
         this->type_ = VertexType::None;
     else if (zeros == 2)
         this->type_ = VertexType::corner;
