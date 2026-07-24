@@ -1,0 +1,5 @@
+*.o
+*.exe
+*.zip
+.xmake/
+build/
